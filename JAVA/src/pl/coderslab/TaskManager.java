@@ -1,11 +1,13 @@
 package pl.coderslab;
 
+
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class TaskManager {
@@ -44,16 +46,15 @@ public class TaskManager {
         String wybranaOpcja = skanujOpcje.next();
         while (!wybranaOpcja.equals("exit")){
         switch (wybranaOpcja){
-            case "add" : add(tab); break;
-            //case remove: ;
+            case "add" : tab = add(tab) ; break;
+            case "remove" : tab = remove(tab); break;
             case "list" : list(tab); break;
+            default: System.out.println("Wybierz tylko opcje z listy");
         }
             System.out.println(ConsoleColors.BLUE + "Wybierz kolejną czynność:" + ConsoleColors.RESET);
         wybranaOpcja = skanujOpcje.next();
         }
-
-
-
+        // exit();
 
     }
 
@@ -96,33 +97,42 @@ public class TaskManager {
             }
             System.out.println("");
         }}
-    public static String[][] add(String[][] tab){
-        tab = Arrays.copyOf(tab, tab.length+1);
-        tab[tab.length-1] = new String[3];
-        for(int i=0; i< tab.length;i++){
-            for(int j=0; j<tab[i].length; j++){
-                System.out.print(tab[i][j] + " ");
-            }
-            System.out.println("");
-        }
+    // metoda dodająca zadania do tablicy
+    public static String[][] add(String[][] tab) {
+        tab = Arrays.copyOf(tab, tab.length + 1);
+        tab[tab.length - 1] = new String[3];
+
         System.out.println("Podaj opis zadania:");
-        Scanner zadanie = new Scanner(System.in);
-        String zadanie1= zadanie.nextLine();
-        tab[tab.length-1][0] = zadanie1;
+        Scanner scan = new Scanner(System.in);
+        tab[tab.length - 1][0] = scan.nextLine();
         System.out.println("Podaj date wykonania zadania:");
-        Scanner data = new Scanner(System.in);
-        tab[tab.length-1][1] = data.nextLine();
+        Scanner scan1 = new Scanner(System.in);
+        tab[tab.length - 1][1] = scan1.nextLine();;
         System.out.println("Czy to zadanie jest ważne [podaj true/false]:");
-        Scanner important = new Scanner(System.in);
-        tab[tab.length-1][2] = important.nextLine();
-        tab[tab.length-1] = new String[3];
-        for(int i=0; i< tab.length;i++){
-            for(int j=0; j<tab[i].length; j++){
-                System.out.print(tab[i][j] + " ");
-            }
-            System.out.println("");
-        }
+        Scanner scan2 = new Scanner(System.in);
+        tab[tab.length - 1][2] = scan2.nextLine();
+
         return tab;
+    }
+// metoda usuwająca zadania z tablicy łącznie z obsługą "wyjątków"
+    public static String[][] remove(String[][] tab){
+        System.out.println("Podaj pozycję do usunięcia: ");
+        Scanner scan = new Scanner(System.in);
+        while (!scan.hasNextInt()){
+            System.out.println("Podaj prawidłową wartość liczbową");
+            scan.next();
+        }
+        int pozycja = scan.nextInt();
+        while (pozycja < 0 || pozycja > tab.length){
+            System.out.println("Podaj liczbę z zakresu 0-" + (tab.length-1));
+            pozycja = scan.nextInt();
+        }
+
+        String[][] remove = new String[tab.length-1][3];
+        System.arraycopy(tab, 0,remove,0,pozycja);
+        System.arraycopy(tab, pozycja+1, remove, pozycja, tab.length - pozycja -1);
+        System.out.println("Zadanie usunięto");
+        return remove;
     }
 
 
