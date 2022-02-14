@@ -3,6 +3,7 @@ package pl.coderslab;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.lang.reflect.Array;
 import java.nio.file.Files;
@@ -22,7 +23,8 @@ public class TaskManager {
         try {
             scan = new Scanner(sciezka);
         } catch (IOException e) {
-            System.out.println("Plik nie istnieje");;
+            System.out.println("Plik nie istnieje");
+            ;
         }
 
         int line = 0; // ilość lini w pliku tasks;
@@ -36,32 +38,41 @@ public class TaskManager {
         // wpisywanie danych z pliku csv do tablicy dwuwymiarowej
         try {
             tabZpliku(tab);
-        }
-        catch (IOException e){
+        } catch (IOException e) {
             System.out.println("Plik nie istnieje!");
         }
         // użytkownik wybiera jaką operację chce wykonać
         System.out.println(ConsoleColors.BLUE + "Wybierz jedną z dostępnych opcji:" + ConsoleColors.RESET);
         Scanner skanujOpcje = new Scanner(System.in);
         String wybranaOpcja = skanujOpcje.next();
-        while (!wybranaOpcja.equals("exit")){
-        switch (wybranaOpcja){
-            case "add" : tab = add(tab) ; break;
-            case "remove" : tab = remove(tab); break;
-            case "list" : list(tab); break;
-            default: System.out.println("Wybierz tylko opcje z listy");
-        }
+        while (!wybranaOpcja.equals("exit")) {
+            switch (wybranaOpcja) {
+                case "add":
+                    tab = add(tab);
+                    break;
+                case "remove":
+                    tab = remove(tab);
+                    break;
+                case "list":
+                    list(tab);
+                    break;
+                default:
+                    System.out.println("Wybierz tylko opcje z listy");
+            }
             System.out.println(ConsoleColors.BLUE + "Wybierz kolejną czynność:" + ConsoleColors.RESET);
-        wybranaOpcja = skanujOpcje.next();
+            wybranaOpcja = skanujOpcje.next();
         }
-        // exit();
+        try {exit(tab);}
+        catch (IOException e) {
+            System.out.println("Nie istnieje plik do którego chcesz zapisać dane");
+        }
 
     }
 
-// metoda służąca wyświetlainu opcji do wyboru
-    public static void desription(){
-        System.out.println(ConsoleColors.BLUE +"Program posiada poniższe funkcjonalności:");
-        String[] opcje = new String[] {
+    // metoda służąca wyświetlainu opcji do wyboru
+    public static void desription() {
+        System.out.println(ConsoleColors.BLUE + "Program posiada poniższe funkcjonalności:");
+        String[] opcje = new String[]{
                 "add - dodaj zadania do realizacji",
                 "remove - usuń zdanie",
                 "list - wyświetl zadania do realizacji",
@@ -72,8 +83,9 @@ public class TaskManager {
         }
         System.out.println("");
     }
+
     // metoda służąca wpisywaniu danych z pliku do tablicy dwuwymiarowej
-    public static String [][] tabZpliku (String[][] tab) throws IOException {
+    public static String[][] tabZpliku(String[][] tab) throws IOException {
         Path sciezka = Paths.get("tasks.csv");
         Scanner scan = new Scanner(sciezka);
         int wiersz = 0;
@@ -88,15 +100,18 @@ public class TaskManager {
         }
         return tab;
     }
-// metoda służąca wyświetleniu tego co jest w tabeli dwuwymiarowej
+
+    // metoda służąca wyświetleniu tego co jest w tabeli dwuwymiarowej
     public static void list(String[][] tab) {
         for (int i = 0; i < tab.length; i++) {
-            System.out.print (i + ":");
+            System.out.print(i + ":");
             for (int j = 0; j < tab[i].length; j++) {
                 System.out.print(tab[i][j] + " ");
             }
             System.out.println("");
-        }}
+        }
+    }
+
     // metoda dodająca zadania do tablicy
     public static String[][] add(String[][] tab) {
         tab = Arrays.copyOf(tab, tab.length + 1);
@@ -107,50 +122,53 @@ public class TaskManager {
         tab[tab.length - 1][0] = scan.nextLine();
         System.out.println("Podaj date wykonania zadania:");
         Scanner scan1 = new Scanner(System.in);
-        tab[tab.length - 1][1] = scan1.nextLine();;
+        tab[tab.length - 1][1] = scan1.nextLine();
+        ;
         System.out.println("Czy to zadanie jest ważne [podaj true/false]:");
         Scanner scan2 = new Scanner(System.in);
         tab[tab.length - 1][2] = scan2.nextLine();
 
         return tab;
     }
-// metoda usuwająca zadania z tablicy łącznie z obsługą "wyjątków"
-    public static String[][] remove(String[][] tab){
+
+    // metoda usuwająca zadania z tablicy łącznie z obsługą "wyjątków"
+    public static String[][] remove(String[][] tab) {
         System.out.println("Podaj pozycję do usunięcia: ");
         Scanner scan = new Scanner(System.in);
-        while (!scan.hasNextInt()){
+        while (!scan.hasNextInt()) {
             System.out.println("Podaj prawidłową wartość liczbową");
             scan.next();
         }
         int pozycja = scan.nextInt();
-        while (pozycja < 0 || pozycja > tab.length){
-            System.out.println("Podaj liczbę z zakresu 0-" + (tab.length-1));
+        while (pozycja < 0 || pozycja > tab.length) {
+            System.out.println("Podaj liczbę z zakresu 0-" + (tab.length - 1));
             pozycja = scan.nextInt();
         }
 
-        String[][] remove = new String[tab.length-1][3];
-        System.arraycopy(tab, 0,remove,0,pozycja);
-        System.arraycopy(tab, pozycja+1, remove, pozycja, tab.length - pozycja -1);
+        String[][] remove = new String[tab.length - 1][3];
+        System.arraycopy(tab, 0, remove, 0, pozycja);
+        System.arraycopy(tab, pozycja + 1, remove, pozycja, tab.length - pozycja - 1);
         System.out.println("Zadanie usunięto");
         return remove;
     }
 
-
-}
-   /* //Metoda służąca wczytywaniu danych z pliku do dwuwymiarowej tablicy
-    public static String[][] tasks() {
-
-
-    public static void EXIT(String[][] tab) {
+    // metoda przesyła tablicę z poprawkami do pliku csv i kończy działanie programu
+    public static void exit(String[][] tab) throws IOException {
         Path sciezka = Paths.get("tasks.csv");
-String [] jedenWymiar = new String[tab.length];
+        String[] jedenWymiar = new String[tab.length];
+        for(int i =0; i < jedenWymiar.length; i++){
+            jedenWymiar[i] = String.join(",", tab[i]);
+        }
+        Files.writeString(sciezka, jedenWymiar[0] + "\n");
+        for (int i =1; i< tab.length; i++){
+            Files.writeString(sciezka, jedenWymiar[i] + "\n", StandardOpenOption.APPEND);
+        }
 
-*//*
-
-*//*
-
+        System.out.println(ConsoleColors.RED_BOLD + "Bye Bye");
     }
-}*/
+}
+
+
 
 
 
