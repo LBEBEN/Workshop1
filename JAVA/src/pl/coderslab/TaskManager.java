@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.lang.reflect.Array;
 import java.nio.file.Files;
@@ -49,23 +51,17 @@ public class TaskManager {
         String wybranaOpcja = skanujOpcje.next();
         while (!wybranaOpcja.equals("exit")) {
             switch (wybranaOpcja) {
-                case "add":
-                    tab = add(tab);
-                    break;
-                case "remove":
-                    tab = remove(tab);
-                    break;
-                case "list":
-                    list(tab);
-                    break;
-                default:
-                    System.out.println("Wybierz tylko opcje z listy");
+                case "add" -> tab = add(tab);
+                case "remove" -> tab = remove(tab);
+                case "list" -> list(tab);
+                default -> System.out.println("Wybierz tylko opcje z listy");
             }
             System.out.println(ConsoleColors.BLUE + "Wybierz kolejną czynność:" + ConsoleColors.RESET);
             wybranaOpcja = skanujOpcje.next();
         }
-        try {exit(tab);}
-        catch (IOException e) {
+        try {
+            exit(tab);
+        } catch (IOException e) {
             System.out.println("Nie istnieje plik do którego chcesz zapisać dane");
         }
 
@@ -122,15 +118,24 @@ public class TaskManager {
         System.out.println("Podaj opis zadania:");
         Scanner scan = new Scanner(System.in);
         tab[tab.length - 1][0] = scan.nextLine();
-        System.out.println("Podaj date wykonania zadania:");
+        System.out.println("Podaj date wykonania zadania [yyyy-mm-dd]:");
         Scanner scan1 = new Scanner(System.in);
+        String data = scan1.nextLine();
+while (tab[tab.length - 1][1] == null){
+       try {
+           sprawdzDate(data);
+           tab[tab.length - 1][1] = data;
+       }
+       catch (DateTimeParseException e) {
+           System.out.println("Podałeś zły format daty");
+           data = scan1.nextLine();
+       }}
 
-        tab[tab.length - 1][1] = scan1.nextLine();
         System.out.println("Czy to zadanie jest ważne [podaj true/false]:");
         Scanner scan2 = new Scanner(System.in);
         String important = scan2.nextLine();
         // obsługa wyjątku zakładające że important nie może przyjmować innej wartości jak true lub false
-        while (!important.equals("true") && !important.equals("false")){
+        while (!important.equals("true") && !important.equals("false")) {
             System.out.println(ConsoleColors.RED + "Wpisz wartość true lub false" + ConsoleColors.RESET);
             important = scan2.next();
         }
@@ -166,13 +171,20 @@ public class TaskManager {
         Path sciezka = Paths.get("tasks.csv");
 
         String[] jedenWymiar = new String[tab.length];
-        for(int i =0; i < jedenWymiar.length; i++){
+        for (int i = 0; i < jedenWymiar.length; i++) {
             jedenWymiar[i] = String.join(",", tab[i]);
         }
 
         Files.write(sciezka, Arrays.asList(jedenWymiar));
 
         System.out.println(ConsoleColors.RED_BOLD + "Bye Bye");
+    }
+    public static String sprawdzDate (String date){
+        DateTimeFormatter dobraForma = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+               LocalDate podanaData = LocalDate.parse(date,dobraForma);
+
+               return podanaData.toString();
     }
 }
 
