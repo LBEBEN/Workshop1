@@ -4,6 +4,8 @@ package pl.coderslab;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.StandardOpenOption;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.lang.reflect.Array;
 import java.nio.file.Files;
@@ -122,14 +124,21 @@ public class TaskManager {
         tab[tab.length - 1][0] = scan.nextLine();
         System.out.println("Podaj date wykonania zadania:");
         Scanner scan1 = new Scanner(System.in);
+
         tab[tab.length - 1][1] = scan1.nextLine();
-        ;
         System.out.println("Czy to zadanie jest ważne [podaj true/false]:");
         Scanner scan2 = new Scanner(System.in);
-        tab[tab.length - 1][2] = scan2.nextLine();
-
+        String important = scan2.nextLine();
+        // obsługa wyjątku zakładające że important nie może przyjmować innej wartości jak true lub false
+        while (!important.equals("true") && !important.equals("false")){
+            System.out.println(ConsoleColors.RED + "Wpisz wartość true lub false" + ConsoleColors.RESET);
+            important = scan2.next();
+        }
+        tab[tab.length - 1][2] = important;
         return tab;
     }
+// metoda sprawdzająca czy podano prawidłową datę
+
 
     // metoda usuwająca zadania z tablicy łącznie z obsługą "wyjątków"
     public static String[][] remove(String[][] tab) {
@@ -155,14 +164,13 @@ public class TaskManager {
     // metoda przesyła tablicę z poprawkami do pliku csv i kończy działanie programu
     public static void exit(String[][] tab) throws IOException {
         Path sciezka = Paths.get("tasks.csv");
+
         String[] jedenWymiar = new String[tab.length];
         for(int i =0; i < jedenWymiar.length; i++){
             jedenWymiar[i] = String.join(",", tab[i]);
         }
-        Files.writeString(sciezka, jedenWymiar[0] + "\n");
-        for (int i =1; i< tab.length; i++){
-            Files.writeString(sciezka, jedenWymiar[i] + "\n", StandardOpenOption.APPEND);
-        }
+
+        Files.write(sciezka, Arrays.asList(jedenWymiar));
 
         System.out.println(ConsoleColors.RED_BOLD + "Bye Bye");
     }
